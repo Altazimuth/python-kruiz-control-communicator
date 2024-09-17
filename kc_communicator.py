@@ -1,10 +1,7 @@
 #
 # Kruiz Control WebSocket Communicator
 # Copyright (c) 2024 Max Waine
-#
-# This software is distributed under the terms of the Free Software Foundation's
-# GNU GPLv2+. The full text can be found in LICENSE, which should be included with this
-# program, or at https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html#SEC1.
+# SPDX: GPL-2.0-or-later
 #
 
 import sys

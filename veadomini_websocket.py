@@ -1,10 +1,7 @@
 #
 # veadotube-mini WebSocket Communicator
 # Copyright (c) 2024 Max Waine
-#
-# This software is distributed under the terms of the Free Software Foundation's
-# GNU GPLv2+. The full text can be found in LICENSE, which should be included with this
-# program, or at https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html#SEC1.
+# SPDX: GPL-2.0-or-later
 #
 
 import os
@@ -23,36 +20,21 @@ class VeadoMiniInstance:
         self.states    = self.get_states()
 
     #
-    # Send stateEvents-type payload with an arg
+    # Send stateEvents-type payload, with or without argument
     #
-    def send_state_event_payload(self, event: str, arg_name: str, arg: str):
-        self.websocket.send(f'''
-            nodes:{{
-                "event": "payload",
-                "type": "stateEvents",
-                "id": "mini",
-                "payload": {{
-                    "event": "{event}",
-                    "{arg_name}": "{arg}"
-                }}
-            }}
-        '''.strip()) # Waste of resources but it makes the code less ugly, so who's to say if it's bad?
-        return self.websocket.recv()
+    def send_state_event_payload(self, event: str, arg_name: str = '', arg: str = ''):
+        message = {
+            'event': 'payload',
+            'type': 'stateEvents',
+            'id': 'mini',
+            'payload': {
+                'event': f'{event}'
+            }
+        }
+        if arg_name and arg:
+            message['payload'][arg_name] = arg
 
-    #
-    # Send stateEvents-type payload with no args
-    #
-    def send_state_event_payload_no_args(self, event: str):
-        self.websocket.send(f'''
-            nodes:{{
-                "event": "payload",
-                "type": "stateEvents",
-                "id": "mini",
-                "payload": {{
-                    "event": "{event}"
-                }}
-            }}
-        '''.strip()) # Waste of resources but it makes the code less ugly, so who's to say if it's bad?
+        self.websocket.send('nodes:' + json.dumps(message))
         return self.websocket.recv()
 
     #
@@ -61,7 +43,7 @@ class VeadoMiniInstance:
     def get_states(self) -> dict[str, int]:
         states = {}
 
-        recv_data   = self.send_state_event_payload_no_args('list')
+        recv_data   = self.send_state_event_payload('list')
         nodes       = recv_data[recv_data.find(':')+1:recv_data.rfind('}')+1]
         nodes_json  = json.loads(nodes)
         states_json = nodes_json["payload"]["states"]
@@ -90,7 +72,7 @@ instances = {}
 def init():
     instance_dir = os.path.expanduser('~/.veadotube/instances')
 
-    print("Initialising veadotube-mini websocket")
+    print("Initialising veadotube-mini WebSocket")
     print("Available instance names:")
     for file in os.listdir(instance_dir):
         filename = os.fsdecode(file)
@@ -100,4 +82,4 @@ def init():
         print(f" * {instance.name}")
         instances[instance.name] = instance
 
-    print("Successfully connected to veadotube-mini websocket")
+    print("Successfully connected to veadotube-mini WebSocket")
