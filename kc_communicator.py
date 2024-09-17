@@ -80,6 +80,7 @@ def on_kruiz_control_event(message):
 # If you want to handle any other custom events, you probably need to handle a new realm.
 #
 def on_custom_event(message):
+    print(message)
     if message.getRealm() == 'kruiz-control':
         on_kruiz_control_event(message)
 

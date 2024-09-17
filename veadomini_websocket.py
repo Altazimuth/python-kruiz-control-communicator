@@ -9,7 +9,6 @@
 
 import os
 import json
-from typing import overload
 
 try:
     from websockets.sync.client import connect
@@ -26,7 +25,6 @@ class VeadoMiniInstance:
     #
     # Send stateEvents-type payload with an arg
     #
-    @overload
     def send_state_event_payload(self, event: str, arg_name: str, arg: str):
         self.websocket.send(f'''
             nodes:{{
@@ -44,8 +42,7 @@ class VeadoMiniInstance:
     #
     # Send stateEvents-type payload with no args
     #
-    @overload
-    def send_state_event_payload(self, event: str):
+    def send_state_event_payload_no_args(self, event: str):
         self.websocket.send(f'''
             nodes:{{
                 "event": "payload",
@@ -64,7 +61,7 @@ class VeadoMiniInstance:
     def get_states(self) -> dict[str, int]:
         states = {}
 
-        recv_data   = self.send_state_event_payload('list')
+        recv_data   = self.send_state_event_payload_no_args('list')
         nodes       = recv_data[recv_data.find(':')+1:recv_data.rfind('}')+1]
         nodes_json  = json.loads(nodes)
         states_json = nodes_json["payload"]["states"]
