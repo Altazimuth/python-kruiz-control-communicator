@@ -11,7 +11,6 @@ import sys
 import os
 import time
 import subprocess
-from functools import reduce
 from typing import Any
 
 import veadomini_websocket
@@ -52,13 +51,14 @@ def on_kruiz_control_event(message):
     event_data    = message.getData()['data']
 
     if event_message == 'TTS':
-        print("KC Event:\n\tMessage: {}\n\tData: {}".format(event_message, event_data))
+        print(f"Received TTS Text:\n\t{event_data}")
 
         event_data = event_data.replace('"', '\\"') # DO NOT LET END-USERS BREAK OUT OF THEIR STRING LITERAL PRISON.
 
-        subprocess.run('./sam.exe "{}"'.format(event_data))
+        subprocess.run(f'./sam.exe "{event_data}"')
         send_kruiz_control_message('DoneWithSAM', 'SomeFeedbackData')
     elif have_veadomini:
+        print("Received")
         [instance, state] = event_data.split(' ')
 
         instances = [instance] if instance != '*' else veadomini_websocket.instances
@@ -75,9 +75,6 @@ def on_kruiz_control_event(message):
         for instance in instances:
             change_state_method(veadomini_websocket.instances[instance], state)
 
-def foo(x, y):
-    print(x)
-    return os.path.exists(x) and os.path.exists(y)
 #
 # This is our hook for handling 'CustomEvent's, emitted by BroadcastCustomEvent.
 # If you want to handle any other custom events, you probably need to handle a new realm.
