@@ -68,18 +68,46 @@ class VeadoMiniInstance:
 VEADOMINI_LEN = len('veadotube mini - ')
 
 instances = {}
+active = True
+
+def handle_event(event_message: str, event_data: str) -> bool:
+    if not active:
+        return False
+
+    if event_message == 'VeadoMini_SetState':
+        change_state_method = VeadoMiniInstance.set_state
+    elif event_message == 'VeadoMini_PushState':
+        change_state_method = VeadoMiniInstance.push_state
+    elif event_message == 'VeadoMini_PopState':
+        change_state_method = VeadoMiniInstance.pop_state
+    else:
+        return False
+
+    print(f"Received veadotube-mini event: {event_message}, {event_data}")
+    [instance, state] = event_data.split(' ')
+
+    instances = [instance] if instance != '*' else instances
+
+    for instance in instances:
+        change_state_method(instances[instance], state)
+
+    return True
 
 def init():
-    instance_dir = os.path.expanduser('~/.veadotube/instances')
+    try:
+        instance_dir = os.path.expanduser('~/.veadotube/instances')
 
-    print("Initialising veadotube-mini WebSocket")
-    print("Available instance names:")
-    for file in os.listdir(instance_dir):
-        filename = os.fsdecode(file)
+        print("Initialising veadotube-mini WebSocket")
+        print("Available instance names:")
+        for file in os.listdir(instance_dir):
+            filename = os.fsdecode(file)
 
-        instance_json = json.loads(open(instance_dir + '/' + filename, 'r').read())
-        instance = VeadoMiniInstance(instance_json['name'][VEADOMINI_LEN:], instance_json['server'])
-        print(f" * {instance.name}")
-        instances[instance.name] = instance
+            instance_json = json.loads(open(instance_dir + '/' + filename, 'r').read())
+            instance = VeadoMiniInstance(instance_json['name'][VEADOMINI_LEN:], instance_json['server'])
+            print(f" * {instance.name}")
+            instances[instance.name] = instance
 
-    print("Successfully connected to veadotube-mini WebSocket")
+        print("Successfully connected to veadotube-mini WebSocket")
+    except:
+        print("Failed to connect to veadotube-mini WebSocket")
+        active = False

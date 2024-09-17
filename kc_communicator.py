@@ -11,6 +11,7 @@ import subprocess
 from typing import Any
 
 import veadomini_websocket
+import sammi_webhook
 
 try:
     from obswebsocket import obsws, exceptions, requests, events
@@ -54,23 +55,9 @@ def on_kruiz_control_event(message):
 
         subprocess.run(f'./sam.exe "{event_data}"')
         send_kruiz_control_message('DoneWithSAM', 'SomeFeedbackData')
-    elif have_veadomini:
-        print("Received")
-        [instance, state] = event_data.split(' ')
-
-        instances = [instance] if instance != '*' else veadomini_websocket.instances
-
-        if event_message == 'VeadoMini_SetState':
-            change_state_method = veadomini_websocket.VeadoMiniInstance.set_state
-        elif event_message == 'VeadoMini_PushState':
-            change_state_method = veadomini_websocket.VeadoMiniInstance.push_state
-        elif event_message == 'VeadoMini_PopState':
-            change_state_method = veadomini_websocket.VeadoMiniInstance.pop_state
-        else:
-            return
-
-        for instance in instances:
-            change_state_method(veadomini_websocket.instances[instance], state)
+    elif not veadomini_websocket.handle_event():
+        if not sammi_webhook.handle_event():
+            pass
 
 #
 # This is our hook for handling 'CustomEvent's, emitted by BroadcastCustomEvent.
@@ -99,11 +86,8 @@ if __name__ == '__main__':
         sys.exit(0)
 
 
-    have_veadomini = True
-    try:
-        veadomini_websocket.init()
-    except:
-        have_veadomini = False
+    veadomini_websocket.init()
+    sammi_webhook.init()
 
     # Try create the websocket.
     print("Initialising OBS websocket")
