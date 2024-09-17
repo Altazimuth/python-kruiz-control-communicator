@@ -46,7 +46,7 @@ def handle_event(event_message: str, event_data: str) -> bool:
         return False
 
     print(f"Received SAMMI event")
-    [trigger, data] = event_data.split(' ')
+    [trigger, data] = event_data.split(' ', 1)
 
     send_message(trigger, data)
 
