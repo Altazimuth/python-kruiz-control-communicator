@@ -55,8 +55,8 @@ def on_kruiz_control_event(message):
 
         subprocess.run(f'./sam.exe "{event_data}"')
         send_kruiz_control_message('DoneWithSAM', 'SomeFeedbackData')
-    elif not veadomini_websocket.handle_event():
-        if not sammi_webhook.handle_event():
+    elif not veadomini_websocket.handle_event(event_message, event_data):
+        if not sammi_webhook.handle_event(event_message, event_data):
             pass
 
 #

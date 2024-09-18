@@ -70,6 +70,9 @@ VEADOMINI_LEN = len('veadotube mini - ')
 instances = {}
 active = True
 
+#
+# Kruiz Control event handler.
+#
 def handle_event(event_message: str, event_data: str) -> bool:
     if not active:
         return False
@@ -93,6 +96,9 @@ def handle_event(event_message: str, event_data: str) -> bool:
 
     return True
 
+#
+# Initialise. Wow.
+#
 def init():
     try:
         instance_dir = os.path.expanduser('~/.veadotube/instances')

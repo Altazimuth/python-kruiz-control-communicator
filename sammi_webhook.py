@@ -33,6 +33,9 @@ try:
 except:
     print("You are missing requests. To install run 'pip install requests'")
 
+#
+# Send a message with a specific trigger and data to SAMMI.
+#
 def send_message(trigger: str, data: str): #data: dict[str, Any]):
     message = { 'trigger': trigger, 'customData': data }
     # We need to lower the timeout to send requests quickly
@@ -41,6 +44,9 @@ def send_message(trigger: str, data: str): #data: dict[str, Any]):
 sammi_url = 'localhost:9450/webhook'
 active = True
 
+#
+# Kruiz Control event handler.
+#
 def handle_event(event_message: str, event_data: str) -> bool:
     if not active or event_message != 'SAMMI_SendMessage':
         return False
@@ -52,6 +58,9 @@ def handle_event(event_message: str, event_data: str) -> bool:
 
     return True
 
+#
+# Initialise. Wow.
+#
 def init():
     try:
         print("Searching for SAMMI webhook")
