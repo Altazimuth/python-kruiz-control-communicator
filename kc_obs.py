@@ -1,3 +1,9 @@
+#
+# Kruiz Control WebSocket Communicator
+# Copyright (c) 2024 Max Waine
+# SPDX: GPL-2.0-or-later
+#
+
 import sys
 import os
 
