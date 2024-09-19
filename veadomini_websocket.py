@@ -89,10 +89,10 @@ def handle_event(event_message: str, event_data: str) -> bool:
     print(f"Received veadotube-mini event: {event_message}, {event_data}")
     [instance, state] = event_data.split(' ')
 
-    instances = [instance] if instance != '*' else instances
+    target_instances = [instance] if instance != '*' else instances
 
-    for instance in instances:
-        change_state_method(instances[instance], state)
+    for instance in target_instances:
+        change_state_method(target_instances[instance], state)
 
     return True
 
