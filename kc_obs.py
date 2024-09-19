@@ -47,8 +47,8 @@ def on_kruiz_control_event(message):
     event_message = message.getData()['message']
     event_data    = message.getData()['data']
 
-    for module in modules:
-        if module.handle_event(event_message, event_data): break
+    # handle_event returns true is the event is eaten. We rely on short-circuiting here.
+    any(module.handle_event(event_message, event_data) for module in modules)
 
 #
 # This is our hook for handling 'CustomEvent's, emitted by BroadcastCustomEvent.
