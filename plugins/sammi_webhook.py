@@ -28,6 +28,11 @@
 
 #from typing import Any
 
+import sys
+
+sys.path.append("..")
+from kc_obs import send_kruiz_control_message
+
 try:
     import requests
 except:
@@ -62,6 +67,8 @@ def handle_event(event_message: str, event_data: str) -> bool:
 # Initialise. Wow.
 #
 def init():
+    global active
+
     try:
         print("Searching for SAMMI webhook")
         requests.get(f'http://{sammi_url}')

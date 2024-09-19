@@ -6,6 +6,10 @@
 
 import os
 import json
+import sys
+
+sys.path.append("..")
+from kc_obs import send_kruiz_control_message
 
 try:
     from websockets.sync.client import connect
@@ -100,18 +104,26 @@ def handle_event(event_message: str, event_data: str) -> bool:
 # Initialise. Wow.
 #
 def init():
+    global active
+
     try:
         instance_dir = os.path.expanduser('~/.veadotube/instances')
 
         print("Initialising veadotube-mini WebSocket")
-        print("Available instance names:")
         for file in os.listdir(instance_dir):
             filename = os.fsdecode(file)
 
-            instance_json = json.loads(open(instance_dir + '/' + filename, 'r').read())
+            try:
+                instance_json = json.loads(open(instance_dir + '/' + filename, 'r').read())
+            except json.JSONDecodeError:
+                continue
             instance = VeadoMiniInstance(instance_json['name'][VEADOMINI_LEN:], instance_json['server'])
-            print(f" * {instance.name}")
             instances[instance.name] = instance
+
+        if instances:
+            print("Available instance names:")
+            for instance in instances:
+                print(f" * {instance}")
 
         print("Successfully connected to veadotube-mini WebSocket")
     except:
