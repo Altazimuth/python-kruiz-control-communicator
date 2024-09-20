@@ -9,6 +9,7 @@ import json
 import sys
 
 sys.path.append("..")
+from plugin_interface import PluginInterface
 from kc_obs import send_kruiz_control_message
 
 try:
@@ -56,7 +57,6 @@ class VeadoMiniInstance:
 
         return states
 
-    #
     def change_state(self, change_type: str, name: str):
         self.send_state_event_payload(change_type, 'state', self.states[name])
 
@@ -71,61 +71,65 @@ class VeadoMiniInstance:
 
 VEADOMINI_LEN = len('veadotube mini - ')
 
-instances = {}
-active = True
+class VeadoMiniPlugin(PluginInterface):
+    instances: dict[str, VeadoMiniInstance]
 
-#
-# Kruiz Control event handler.
-#
-def handle_event(event_message: str, event_data: str) -> bool:
-    if not active:
-        return False
+    @property
+    def name() -> str:
+        return "veadotube-mini"
 
-    if event_message == 'VeadoMini_SetState':
-        change_state_method = VeadoMiniInstance.set_state
-    elif event_message == 'VeadoMini_PushState':
-        change_state_method = VeadoMiniInstance.push_state
-    elif event_message == 'VeadoMini_PopState':
-        change_state_method = VeadoMiniInstance.pop_state
-    else:
-        return False
+    #
+    # Kruiz Control event handler.
+    #
+    def handle_event(self, event_message: str, event_data: str) -> bool:
+        if not self.active:
+            return False
 
-    print(f"Received veadotube-mini event: {event_message}, {event_data}")
-    [instance, state] = event_data.split(' ')
+        if event_message == 'VeadoMini_SetState':
+            change_state_method = VeadoMiniInstance.set_state
+        elif event_message == 'VeadoMini_PushState':
+            change_state_method = VeadoMiniInstance.push_state
+        elif event_message == 'VeadoMini_PopState':
+            change_state_method = VeadoMiniInstance.pop_state
+        else:
+            return False
 
-    target_instances = [instance] if instance != '*' else instances
+        print(f"Received veadotube-mini event: {event_message}, {event_data}")
+        [instance, state] = event_data.split(' ')
 
-    for instance in target_instances:
-        change_state_method(target_instances[instance], state)
+        target_instances = [instance] if instance != '*' else self.instances
 
-    return True
+        for instance in target_instances:
+            change_state_method(target_instances[instance], state)
 
-#
-# Initialise. Wow.
-#
-def init():
-    global active
+        return True
 
-    try:
-        instance_dir = os.path.expanduser('~/.veadotube/instances')
+    #
+    # Initialise. Wow.
+    #
+    def init(self) -> bool:
+        try:
+            instance_dir = os.path.expanduser('~/.veadotube/instances')
 
-        print("Initialising veadotube-mini WebSocket")
-        for file in os.listdir(instance_dir):
-            filename = os.fsdecode(file)
+            print("Initialising veadotube-mini WebSocket")
+            for file in os.listdir(instance_dir):
+                filename = os.fsdecode(file)
 
-            try:
-                instance_json = json.loads(open(instance_dir + '/' + filename, 'r').read())
-            except json.JSONDecodeError:
-                continue
-            instance = VeadoMiniInstance(instance_json['name'][VEADOMINI_LEN:], instance_json['server'])
-            instances[instance.name] = instance
+                try:
+                    instance_json = json.loads(open(instance_dir + '/' + filename, 'r').read())
+                except json.JSONDecodeError:
+                    continue
+                instance = VeadoMiniInstance(instance_json['name'][VEADOMINI_LEN:], instance_json['server'])
+                self.instances[instance.name] = instance
 
-        if instances:
-            print("Available instance names:")
-            for instance in instances:
-                print(f" * {instance}")
+            if self.instances:
+                print("Available instance names:")
+                for instance in self.instances:
+                    print(f" * {instance}")
 
-        print("Successfully connected to veadotube-mini WebSocket")
-    except:
-        print("Failed to connect to veadotube-mini WebSocket")
-        active = False
+            print("Successfully connected to veadotube-mini WebSocket")
+            return True
+        except:
+            print("Failed to connect to veadotube-mini WebSocket")
+            self.active = False
+            return False

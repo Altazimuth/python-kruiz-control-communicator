@@ -7,7 +7,7 @@
 import sys
 import os
 
-from typing import Any
+from typing import Any, List
 
 try:
     from obswebsocket import obsws, exceptions, requests, events
@@ -17,6 +17,8 @@ except:
 
 ws = obsws()
 modules = []
+
+from plugin_interface import PluginInterface
 
 #
 # This function exists because obswebsocket expects a response,
@@ -58,14 +60,14 @@ def on_custom_event(message):
     if message.getRealm() == 'kruiz-control':
         on_kruiz_control_event(message)
 
-def init(plugins):
+def init(plugins: List[PluginInterface]):
     global modules, ws
 
     modules = plugins
 
     OBS_SETTING_PATHS = ('./obs/host.txt', './obs/port.txt', './obs/password.txt')
 
-    if all([os.path.exists(path) for path in OBS_SETTING_PATHS]):
+    if all(os.path.exists(path) for path in OBS_SETTING_PATHS):
         host     = open('./obs/host.txt', 'r').read().strip()
         port     = int(open('./obs/port.txt', 'r').read().strip())
         password = open('./obs/password.txt', 'r').read().strip()

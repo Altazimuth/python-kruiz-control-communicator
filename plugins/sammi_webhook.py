@@ -31,6 +31,7 @@
 import sys
 
 sys.path.append("..")
+from plugin_interface import PluginInterface
 from kc_obs import send_kruiz_control_message
 
 try:
@@ -47,32 +48,36 @@ def send_message(trigger: str, data: str): #data: dict[str, Any]):
     requests.post(f'http://{sammi_url}', json=message, timeout=0.05)
 
 sammi_url = 'localhost:9450/webhook'
-active = True
 
-#
-# Kruiz Control event handler.
-#
-def handle_event(event_message: str, event_data: str) -> bool:
-    if not active or event_message != 'SAMMI_SendMessage':
-        return False
+class SAMMIPlugin(PluginInterface):
+    @property
+    def name() -> str:
+        return "SAMMI"
 
-    print(f"Received SAMMI event")
-    [trigger, data] = event_data.split(' ', 1)
+    #
+    # Kruiz Control event handler.
+    #
+    def handle_event(self, event_message: str, event_data: str) -> bool:
+        if not self.active or event_message != 'SAMMI_SendMessage':
+            return False
 
-    send_message(trigger, data)
+        print(f"Received SAMMI event")
+        [trigger, data] = event_data.split(' ', 1)
 
-    return True
+        send_message(trigger, data)
 
-#
-# Initialise. Wow.
-#
-def init():
-    global active
+        return True
 
-    try:
-        print("Searching for SAMMI webhook")
-        requests.get(f'http://{sammi_url}')
-        print("Found SAMMI webhook")
-    except:
-        print("Failed to find SAMMI webhook")
-        active = False
+    #
+    # Initialise. Wow.
+    #
+    def init(self) -> bool:
+        try:
+            print("Searching for SAMMI webhook")
+            requests.get(f'http://{sammi_url}')
+            print("Found SAMMI webhook")
+            return True
+        except:
+            print("Failed to find SAMMI webhook")
+            self.active = False
+            return False
