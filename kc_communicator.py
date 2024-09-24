@@ -9,9 +9,13 @@ import pkgutil
 import time
 import inspect
 
+from pathlib import Path
+
 from plugin_interface import PluginInterface
 import kc_obs
 import plugins
+
+ROOT_DIR = (Path(__file__).resolve().parent).resolve()
 
 #
 # Load all modules in the ./plugins folder

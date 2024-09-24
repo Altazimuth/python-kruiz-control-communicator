@@ -19,9 +19,10 @@ from threading import Lock
 sys.path.append("..")
 from plugin_interface import PluginInterface
 from kc_obs import send_kruiz_control_message
+from kc_communicator import ROOT_DIR
 
-WAV_DIR = './sam/wav'
-SAM_EXE = './sam/sam.exe'
+WAV_DIR = ROOT_DIR / 'sam/wav'
+SAM_EXE = ROOT_DIR / 'sam/sam.exe'
 
 class SAMPlugin(PluginInterface):
     lock: Lock

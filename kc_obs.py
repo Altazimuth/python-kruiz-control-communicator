@@ -8,6 +8,7 @@ import sys
 import os
 
 from typing import Any, List
+from kc_communicator import ROOT_DIR
 
 try:
     from obswebsocket import obsws, exceptions, requests, events
@@ -68,9 +69,9 @@ def init(plugins: List[PluginInterface]):
     OBS_SETTING_PATHS = ('./obs/host.txt', './obs/port.txt', './obs/password.txt')
 
     if all(os.path.exists(path) for path in OBS_SETTING_PATHS):
-        host     = open('./obs/host.txt', 'r').read().strip()
-        port     = int(open('./obs/port.txt', 'r').read().strip())
-        password = open('./obs/password.txt', 'r').read().strip()
+        host     = open(ROOT_DIR / 'obs/host.txt', 'r').read().strip()
+        port     = int(open(ROOT_DIR / 'obs/port.txt', 'r').read().strip())
+        password = open(ROOT_DIR /'obs/password.txt', 'r').read().strip()
     else:
         if not os.path.exists('./obs'): os.makedirs('./obs')
         for path in OBS_SETTING_PATHS:
