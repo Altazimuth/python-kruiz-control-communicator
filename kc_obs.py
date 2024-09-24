@@ -66,7 +66,7 @@ def init(plugins: List[PluginInterface]):
 
     modules = plugins
 
-    OBS_SETTING_PATHS = ('./obs/host.txt', './obs/port.txt', './obs/password.txt')
+    OBS_SETTING_PATHS = [ROOT_DIR / 'obs/host.txt', ROOT_DIR / 'obs/port.txt', ROOT_DIR / 'obs/password.txt']
 
     if all(os.path.exists(path) for path in OBS_SETTING_PATHS):
         host     = open(ROOT_DIR / 'obs/host.txt', 'r').read().strip()
