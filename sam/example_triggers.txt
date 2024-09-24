@@ -1,0 +1,36 @@
+# This plugin relies on SAM. You can find it at:
+# https://simulationcorner.net/index.php?page=sam
+
+# Allow test queueing TTS with a command.
+OnCommand b 0 !tts_queue
+Function 'return { v_SubMessageObj: { user_name: [user], message: { text: [after] } } }'
+OBS Send "TTS_Queue" "[v_SubMessageObj]"
+
+# Queue TTS on Twitch subscription message.
+OnTWSubMessage
+Function 'return { v_SubMessageObj: { user_name: [user], message: { text: [message] } } }'
+OBS Send "TTS_Queue" "[v_SubMessageObj]"
+#OBS Send "TTS_Queue" "[data]"
+
+# Send the TTS_Play signal to the Python plugin when KC_TTS_Play_Trigger's visibility is toggled.
+# Toggling visibility should be bound to some sort of hotkey.
+OnOBSSourceVisibility PNGTuber KC_TTS_Play_Trigger toggle
+OBS Send "TTS_Play"
+
+# When the Python plugin tells us TTS_Ready we need to start playing the sound clip.
+# Setting the OBS media path of KC_TTS means that KC_TTS will automatically start playing.
+OnOBSCustomMessage "TTS_Ready"
+Variable Load v_TTS_Playing
+Variable Set v_TTS_Playing true
+OBS Media Path KC_TTS "{data}"
+
+# When KC_TTS_Pause_Trigger's visibility is toggled we want to toggle if KC_TTS is playing.
+# Toggling visibility should be bound to some sort of hotkey.
+OnOBSSourceVisibility PNGTuber KC_TTS_Pause_Trigger toggle
+Variable Load v_TTS_Playing
+if 3 {v_TTS_Playing} = true
+    OBS Media Pause KC_TTS
+    Variable Set v_TTS_Playing false
+    exit
+OBS Media Play KC_TTS
+Variable Set v_TTS_Playing true

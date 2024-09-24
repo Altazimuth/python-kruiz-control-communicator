@@ -1,6 +1,7 @@
 # Custom additions
-obs/
-sam/
+obs/*
+sam/*
+!*/example_triggers.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

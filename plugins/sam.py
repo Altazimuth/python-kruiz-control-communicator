@@ -4,6 +4,9 @@
 # SPDX: GPL-2.0-or-later
 #
 
+# This plugin relies on SAM. You can find it at:
+# https://simulationcorner.net/index.php?page=sam
+
 import sys
 import os
 import subprocess
