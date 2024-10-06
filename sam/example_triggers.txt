@@ -8,7 +8,7 @@ OBS Send "TTS_Queue" "[v_SubMessageObj]"
 
 # Queue TTS on Twitch subscription message.
 OnTWSubMessage
-Function 'return { v_SubMessageObj: { user_name: [user], message: { text: [message] } } }'
+Function 'return { v_SubMessageObj: { user_name: [name], message: { text: [message] } } }'
 OBS Send "TTS_Queue" "[v_SubMessageObj]"
 #OBS Send "TTS_Queue" "[data]"
 

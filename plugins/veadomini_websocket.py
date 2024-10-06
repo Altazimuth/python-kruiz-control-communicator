@@ -72,7 +72,7 @@ class VeadoMiniInstance:
 VEADOMINI_LEN = len('veadotube mini - ')
 
 class VeadoMiniPlugin(PluginInterface):
-    instances: dict[str, VeadoMiniInstance]
+    instances: dict[str, VeadoMiniInstance] = dict[str, VeadoMiniInstance]()
 
     @property
     def name() -> str:
