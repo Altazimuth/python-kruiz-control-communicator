@@ -53,7 +53,7 @@ class VeadoMiniInstance:
         nodes_json  = json.loads(nodes)
         states_json = nodes_json["payload"]["states"]
         for state in states_json:
-            states[state["name"]] = int(state["id"])
+            states[state["name"]] = int(state["id"], 16)
 
         return states
 
