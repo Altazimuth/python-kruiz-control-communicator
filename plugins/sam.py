@@ -50,7 +50,8 @@ class SAMPlugin(PluginInterface):
             print(f"\tText: {text}")
             print(f"\tTime: {time_str}")
 
-            self.wav_queue.put((user_name, text, time_str))
+            if text.strip():
+                self.wav_queue.put((user_name, text, time_str))
         elif event_message == 'TTS_Play':
             if self.wav_queue.empty():
                 return
